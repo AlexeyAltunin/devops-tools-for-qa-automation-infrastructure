@@ -1,0 +1,13 @@
+{
+  "name": "idea",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "demoTest": "mocha -t 30000 google_search_test.js"
+  },
+  "dependencies": {
+    "selenium-webdriver": "4.0.0-alpha.5",
+    "mocha": "6.2.2",
+    "chromedriver": "79.0.0"
+  }
+}
