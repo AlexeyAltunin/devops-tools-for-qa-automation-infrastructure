@@ -1,8 +1,6 @@
 require('chromedriver');
 const {Builder, By, Key, until} = require('selenium-webdriver');
 
-process.env.APPIUM_HOST
-
 describe('Google Search', function() {
   let driver;
 

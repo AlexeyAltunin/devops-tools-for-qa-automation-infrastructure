@@ -4,7 +4,9 @@ const path = require('path');
 // (Android deviceName is ignored by Appium but is still required)
 // If we're using SauceLabs, set the Android deviceName and platformVersion to
 // the latest supported SauceLabs device and version
-const DEFAULT_ANDROID_DEVICE_NAME = 'Android Emulator';
+const DEFAULT_ANDROID_DEVICE_NAME = process.env.USE_SELENOID
+  ? 'android'
+  : 'Android Emulator'
 const DEFAULT_ANDROID_PLATFORM_VERSION = null;
 
 const androidCaps = {
@@ -16,10 +18,15 @@ const androidCaps = {
   app: undefined, // Will be added in tests
 };
 
+const host = process.env.APPIUM_HOST || 'localhost';
+const port = process.env.APPIUM_PORT || '4723';
+
 // figure out where the Appium server should be pointing to
-const serverConfig = {
-    host: process.env.APPIUM_HOST || 'localhost',
-    port: process.env.APPIUM_PORT || 4723
+const serverConfig = process.env.USE_SELENOID
+  ? `http://${host}:4444/wd/hub`
+  : {
+    host,
+    port
   };
 
 
