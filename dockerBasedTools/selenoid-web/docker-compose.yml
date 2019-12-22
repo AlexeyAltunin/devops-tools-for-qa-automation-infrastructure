@@ -4,16 +4,16 @@ services:
     image: "aerokube/selenoid"
     network_mode: bridge
     ports:
-      - "4444:4444"
+      - "4445:4445"
     volumes:
-      - "/Users/alexey/Documents/SQA Days/Poland 2020/devops-tools-for-qa-automation-infrastructure/dockerBasedTools/selenoid-web:/etc/selenoid/" # assumed current dir contains browsers.json
+      - "$PWD:/etc/selenoid/" # assumed current dir contains browsers.json
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "${HOME}:/root"
       - "$PWD/video/:/opt/selenoid/video/"
     environment:
       - "OVERRIDE_HOME=${HOME}"
       - "OVERRIDE_VIDEO_OUTPUT_DIR=$PWD/video/"
-    command: -conf /etc/selenoid/browsers.json -limit 2 -disable-queue -session-attempt-timeout 120s -session-delete-timeout 120s -timeout 120s -video-output-dir /opt/selenoid/video/
+    command: -listen :4445 -conf /etc/selenoid/browsers.json -limit 2 -disable-queue -session-attempt-timeout 120s -session-delete-timeout 120s -timeout 120s -video-output-dir /opt/selenoid/video/
   selenoid-ui:
     image: "aerokube/selenoid-ui:latest"
     network_mode: bridge
@@ -21,4 +21,4 @@ services:
       - selenoid
     ports:
       - "8080:8080"
-    command: ["--selenoid-uri", "http://selenoid:4444"]
+    command: ["--selenoid-uri", "http://selenoid:4445"]

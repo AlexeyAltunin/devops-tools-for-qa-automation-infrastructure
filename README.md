@@ -60,10 +60,11 @@ What could be used instead:
 
 The second step is to run tests via popular docker based tools 
 
-Preconditions:
+**Preconditions:**
 * Installed / run [Docker](https://www.docker.com)
+* Installed [Docker Compose](https://docs.docker.com/compose/install/)
 
-Steps to execute tests:
+**Steps to execute tests:**
 * Selenium grid
 ```
 cd dockerBasedTools/selenium-grid
@@ -73,7 +74,7 @@ export REMOTE_HOST=http://localhost:4444/wd/hub
 
 run web tests from part 1
 
-docker-compose down                     // stop all containers
+docker-compose down                     // stop/delete all containers
 ```
 * Selenoid web
 ```
@@ -82,18 +83,18 @@ cat browsers.json                       // set browsers that you need, ex: selen
 docker pull selenoid/vnc:chrome_76.0    // pull image  
 docker-compose up -d                    // run selenoid server + ui
 http://localhost:8080/#/                // open in browser
-export REMOTE_HOST=http://localhost:4444/wd/hub
+export REMOTE_HOST=http://localhost:4445/wd/hub
 
 run web tests from part 1
 
-docker-compose down                     // stop all containers
+docker-compose down                     // stop/delete all containers
 ```
 
 * Selenoid Android 
 
 ["Android emulator can only be launched on a hardware 
 server or a particular type of virtual machines supporting nested 
-virtualization.](https://medium.com/@aandryashin/selenium-more-android-sweets-3839148d1bac)
+virtualization."](https://medium.com/@aandryashin/selenium-more-android-sweets-3839148d1bac)
 
 ["Docker for Mac does not forward KVM"](https://github.com/aerokube/selenoid/issues/687)
 
@@ -103,14 +104,21 @@ cd dockerBasedTools/selenoid-android
 cat browsers.json                   // set simulator that you need, ex: selenoid/android:6.0
 docker pull selenoid/android:6.0    // pull image  
 docker-compose up -d                // run selenoid server + ui
-http://localhost:8080/#/            // open in browser
+http://localhost:8081/#/            // open in browser
 export USE_SELENOID=true
 
 run android tests from part 1
 
-docker-compose down                 // stop all containers
+docker-compose down                 // stop/delete all containers
 ```
 
-Links:
+**Links:**
 * [docker-selenium](https://github.com/SeleniumHQ/docker-selenium)
 * [selenoid](https://github.com/aerokube/selenoid)
+
+**What could be used instead:**
+
+Docker is the most popular container runtime environment.
+[Though Docker still made up 83 percent of containers in 2018, that number is
+ down from 99 percent in 2017.](https://containerjournal.com/topics/container-ecosystems/5-container-alternatives-to-docker/)
+ However in this guide we can use docker as these tools for test running (Selenium grid, Selenoid) are docker based.
