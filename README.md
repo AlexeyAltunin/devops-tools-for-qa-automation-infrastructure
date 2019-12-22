@@ -21,13 +21,13 @@ be improved starting from running test locally to Infrastructure as Code (IaC) p
 
 The first step is just to prepare demo tests for web/android and run it locally.
 
-Preconditions:
+**Preconditions:**
 * Installed [Node.js](https://nodejs.org/en/)
 * Installed [Chrome](https://www.google.com/intl/ru/chrome/)
 * Installed [Appium](http://appium.io/docs/en/about-appium/getting-started/)
 * Installed [Android emulator](https://developer.android.com/studio/run/emulator)
 
-Steps to execute tests:
+**Steps to execute tests:**
 * Web
 ```
 cd uiTestsJS/selenium-web
@@ -47,11 +47,11 @@ npm run demoTest
 Be sure that tests are started and passed. We will not run it via local 
 browsers/emulators anymore!
 
-More examples:
+**Links:**
 * [Selenium tests](https://github.com/SeleniumHQ/selenium/tree/master/javascript/node/selenium-webdriver/example)
 * [Appium tests](https://github.com/appium/appium/tree/master/sample-code/javascript-wd)
 
-What could be used instead:
+**What could be used instead:**
 * Any programming languages that you like for selenium/appium tests
 * Any tests that you like
 * Any test runner 

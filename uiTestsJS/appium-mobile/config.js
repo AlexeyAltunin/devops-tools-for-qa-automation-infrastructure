@@ -23,7 +23,7 @@ const port = process.env.APPIUM_PORT || '4723';
 
 // figure out where the Appium server should be pointing to
 const serverConfig = process.env.USE_SELENOID
-  ? `http://${host}:4444/wd/hub`
+  ? `http://${host}:4446/wd/hub`
   : {
     host,
     port
