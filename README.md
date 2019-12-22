@@ -47,11 +47,11 @@ npm run demoTest
 Be sure that tests are started and passed. We will not run it via local 
 browsers/emulators anymore!
 
-More examples:
+**Links:**
 * [Selenium tests](https://github.com/SeleniumHQ/selenium/tree/master/javascript/node/selenium-webdriver/example)
 * [Appium tests](https://github.com/appium/appium/tree/master/sample-code/javascript-wd)
 
-What could be used instead:
+**What could be used instead:**
 * Any programming languages that you like for selenium/appium tests
 * Any tests that you like
 * Any test runner 
