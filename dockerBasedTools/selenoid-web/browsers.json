@@ -1,0 +1,15 @@
+{
+  "chrome": {
+    "default": "76.0",
+    "versions": {
+      "66.0": {
+        "image": "selenoid/vnc:chrome_66.0",
+        "port": "4444"
+      },
+      "76.0": {
+        "image": "selenoid/vnc:chrome_76.0",
+        "port": "4444"
+      }
+    }
+  }
+}

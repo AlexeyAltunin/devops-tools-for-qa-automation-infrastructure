@@ -47,11 +47,70 @@ npm run demoTest
 Be sure that tests are started and passed. We will not run it via local 
 browsers/emulators anymore!
 
-**Links:**
+More examples:
 * [Selenium tests](https://github.com/SeleniumHQ/selenium/tree/master/javascript/node/selenium-webdriver/example)
 * [Appium tests](https://github.com/appium/appium/tree/master/sample-code/javascript-wd)
 
-**What could be used instead:**
+What could be used instead:
 * Any programming languages that you like for selenium/appium tests
 * Any tests that you like
 * Any test runner 
+
+### 2. Docker based Tools
+
+The second step is to run tests via popular docker based tools 
+
+Preconditions:
+* Installed / run [Docker](https://www.docker.com)
+
+Steps to execute tests:
+* Selenium grid
+```
+cd dockerBasedTools/selenium-grid
+docker-compose up -d                    // run selenium hub with nodes
+http://localhost:4444/grid/console      // open in browser
+export REMOTE_HOST=http://localhost:4444/wd/hub
+
+run web tests from part 1
+
+docker-compose down                     // stop all containers
+```
+* Selenoid web
+```
+cd dockerBasedTools/selenoid-web
+cat browsers.json                       // set browsers that you need, ex: selenoid/vnc:chrome_76.0
+docker pull selenoid/vnc:chrome_76.0    // pull image  
+docker-compose up -d                    // run selenoid server + ui
+http://localhost:8080/#/                // open in browser
+export REMOTE_HOST=http://localhost:4444/wd/hub
+
+run web tests from part 1
+
+docker-compose down                     // stop all containers
+```
+
+* Selenoid Android 
+
+["Android emulator can only be launched on a hardware 
+server or a particular type of virtual machines supporting nested 
+virtualization.](https://medium.com/@aandryashin/selenium-more-android-sweets-3839148d1bac)
+
+["Docker for Mac does not forward KVM"](https://github.com/aerokube/selenoid/issues/687)
+
+Instruction how to setup VM with KVM via GCP will be in part 4 of this guide.
+```
+cd dockerBasedTools/selenoid-android
+cat browsers.json                   // set simulator that you need, ex: selenoid/android:6.0
+docker pull selenoid/android:6.0    // pull image  
+docker-compose up -d                // run selenoid server + ui
+http://localhost:8080/#/            // open in browser
+export USE_SELENOID=true
+
+run android tests from part 1
+
+docker-compose down                 // stop all containers
+```
+
+Links:
+* [docker-selenium](https://github.com/SeleniumHQ/docker-selenium)
+* [selenoid](https://github.com/aerokube/selenoid)

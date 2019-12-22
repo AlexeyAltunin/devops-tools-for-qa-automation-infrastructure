@@ -1,0 +1,24 @@
+version: '3'
+services:
+  selenoid:
+    image: "aerokube/selenoid"
+    network_mode: bridge
+    restart: always
+    ports:
+      - "4444:4444"
+    volumes:
+      - "$PWD:/etc/selenoid/" # assumed current dir contains browsers.json
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "${HOME}:/root"
+    environment:
+      - "OVERRIDE_HOME=${HOME}"
+    command: -conf /etc/selenoid/browsers.json -limit 2 -session-attempt-timeout 4m0s -service-startup-timeout 4m0s -timeout 4m0s -mem 3g -cpu 3.0
+  selenoid-ui:
+    image: "aerokube/selenoid-ui:latest"
+    network_mode: bridge
+    restart: always
+    links:
+      - selenoid
+    ports:
+      - "8080:8080"
+    command: ["--selenoid-uri", "http://selenoid:4444"]
