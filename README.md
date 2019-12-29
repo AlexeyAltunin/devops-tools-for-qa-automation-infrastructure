@@ -124,7 +124,7 @@ Docker is the most popular container runtime environment.
  However in this guide we can use docker as these tools for test running (Selenium grid, Selenoid) are docker based.
 
 
-### 3. CI/CD system (skip the step if you don't want to run it locally)
+### 3. CI/CD system
 
 The third step is to run tests via CI system (Gitlab CI) that will be setup 
 locally . There will be 2 jobs to run test via selenium-grid and selenoid-web
@@ -214,7 +214,7 @@ docker ps                                               // check there are not r
 **What could be used instead:**
 
 Whatever you like. CI/CD system is **key part** of test automation infrastructure but it is completely up to you to use that one that you like 
-more or used by your compony. 
+more or used by your company. 
  
  The most popular systems:
  
@@ -223,3 +223,194 @@ more or used by your compony.
  * [Bamboo](https://www.atlassian.com/software/bamboo)
  * [Travis](https://travis-ci.com/plans)
  
+ 
+ ### 4. Cloud platforms (GCP)
+
+The fourth step is to use Google Cloud Platform to run each docker based tool on separate VM:
+* VM with Selenoid (web)
+* VM with Selenoid (android) with KVM support
+* K8s cluster with Selenium grid **(will be setup in the next step)**
+
+Home work (in this step we will run it locally from step 3 setup): 
+* VM with Gitlab server
+* VM with gitlab runner 
+
+**Preconditions:**
+* Created [GCP account](https://console.cloud.google.com), use 300$ trial
+* Created GCP project, ex: **devops-tools**
+* Added [SSH keys](https://console.cloud.google.com/compute/metadata/sshKeys) that can be used to connect to the VM instances of a project
+* Installed [gcloud](https://cloud.google.com/sdk/docs/)
+
+**Steps to execute tests:**
+
+* Create VM with Selenoid web
+```
+gcloud auth list                        // get account list
+gcloud config set account `ACCOUNT`     // setup gcloud to use your account
+
+// create instance:
+gcloud compute instances create selenoid-web \
+  --boot-disk-size=50GB \
+  --image-family ubuntu-1604-lts \
+  --image-project=ubuntu-os-cloud \
+  --machine-type=g1-small \
+  --tags selenium \
+  --preemptible \
+  --restart-on-failure
+``` 
+
+* Access selenoid-web VM via SSH
+```
+ssh user@<instace_public_ip> -i ~/.ssh/publicKey
+sudo su --
+```
+
+* Install docker, docker-compose, pull selenoid components
+```
+apt update
+apt install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+apt update
+apt-cache policy docker-ce
+apt install docker-ce
+systemctl status docker
+
+docker pull selenoid/android:6.0
+docker pull selenoid/vnc:chrome_76.0
+
+curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+```  
+  
+* Clone the project with selenoid docker-compose
+```
+git clone https://github.com/AlexeyAltunin/devops-tools-for-qa-automation-infrastructure.git
+
+exit VM
+```
+
+* Create image for Selenoid Android with KVM support based on disk for selenoid-web
+```
+gcloud compute instances stop selenoid-web
+gcloud compute images create docker--selenoid-kvm-vm-ubuntu-1604-image --source-disk selenoid-web --source-disk-zone europe-west4-a --licenses "https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx"
+```
+
+* Create VM with Selenoid Android based on previously created KVM image
+```
+gcloud compute instances create selenoid-android \
+  --boot-disk-size=50GB \
+  --image docker-selenoid-kvm-vm-ubuntu-1604-image \
+  --image-project=devops-tools-263410 \
+  --machine-type=n1-standard-4 \
+  --tags selenium \
+  --preemptible \
+  --restart-on-failure
+```
+
+* Access selenoid-android VM via SSH and [turn on KVM](https://www.server-world.info/en/note?os=Ubuntu_18.04&p=kvm&f=8) 
+```
+ssh user@<instace_public_ip> -i ~/.ssh/publicKey
+sudo su --
+cat /sys/module/kvm_intel/parameters/nested 
+echo 'options kvm_intel nested=1' >> /etc/modprobe.d/qemu-system-x86.conf
+
+exit VM
+gcloud compute instances stop selenoid-android
+```
+
+* Create firewall rules to open ports
+```
+gcloud compute firewall-rules create selenium-docker-based \
+  --target-tags selenium \
+  --source-ranges 0.0.0.0/0 \
+  --allow tcp:4444,tcp:4445,tcp:4446,tcp:8080,tcp:5900,tcp:7070,tcp:9090,tcp:8081
+```
+
+* Start VMs 
+```
+gcloud compute instances list
+gcloud compute instances start selenoid-web
+gcloud compute instances start selenoid-android
+```
+
+* Run Selenoid web
+```
+ssh user@<instace_public_ip> -i ~/.ssh/publicKey
+sudo su --
+cd devops-tools-for-qa-automation-infrastructure/dockerBasedTools/selenoid-web/
+docker-compose up -d
+
+docker-compose ps
+output:
+selenoid-web_selenoid-ui_1_dd6873036cac   /selenoid-ui --selenoid-ur ...   Up (healthy)   0.0.0.0:8080->8080/tcp          
+selenoid-web_selenoid_1_d8308aba93e6      /usr/bin/selenoid -listen  ...   Up             4444/tcp, 0.0.0.0:4445->4445/tcp
+
+exit from VM
+open in browser http://<instace_public_ip>:8080
+```
+
+* Run Selenoid Android
+```
+ssh user@<instace_public_ip> -i ~/.ssh/publicKey
+sudo su --
+
+check KVM:
+cat /sys/module/kvm_intel/parameters/nested 
+output:
+Y
+
+cd devops-tools-for-qa-automation-infrastructure/dockerBasedTools/selenoid-android/
+docker-compose up -d
+
+docker-compose ps
+output:
+selenoid-android_selenoid-ui_1_888c3c8c22ed   /selenoid-ui --selenoid-ur ...   Up (healthy)   0.0.0.0:8081->8080/tcp          
+selenoid-android_selenoid_1_cc45d1fd456d      /usr/bin/selenoid -listen  ...   Up             4444/tcp, 0.0.0.0:4446->4446/tcp
+
+exit from VM
+open in browser http://<instace_public_ip>:8080
+```
+
+* Run gitlab server and runner from part 3
+
+* Push pipeline configuration (.gitlab-ci.yml)
+```
+git clone http://localhost/root/local-run.git
+open cloudProviders/gcp/.gitlab-ci.example.gcp.selenoid.web.android.yml and set <instace_public_ip> for each job
+cp cloudProviders/gcp/.gitlab-ci.example.gcp.selenoid.web.android.yml local-run/.gitlab-ci.yml
+cd local-run/
+git add .gitlab-ci.yml
+git commit -m "add pipeline config with selenoid web/android in GCP"
+git push
+
+open http://localhost/root/local-run/pipelines
+check that all jobs are passed (green)
+click on each job, check what was executed and compare with .gitlab-ci.yml
+
+gitlab-runner stop                                      // stop runner
+cd ../
+docker-compose -f docker-compose-gitlab-macos.yml down  // stop gitlab
+docker ps                                               // check there are not running containers
+```
+
+* Stop VMs
+```
+gcloud compute instances stop selenoid-web
+gcloud compute instances stop selenoid-android
+```
+
+**Links:**
+* [GCP](https://cloud.google.com/)
+* [Cloud SDK](https://cloud.google.com/sdk/docs/)
+
+**What could be used instead:**
+
+Whatever you like. Public cloud is very valuable and flexible part of 
+automation infrastructure but it is completely up to you to use that provider that you like more or used by your company.  
+ 
+ The most popular cloud providers:
+ 
+ * [Amazon AWS](https://aws.amazon.com/)
+ * [Microsoft Azure](https://azure.microsoft.com/en-us/)
+ * [Openstack](https://www.openstack.org)
