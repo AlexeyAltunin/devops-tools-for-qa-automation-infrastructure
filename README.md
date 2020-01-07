@@ -456,7 +456,7 @@ kubectl expose deployment selenium-hub --name=selenium-hub-external --labels="ap
 kubectl get svc selenium-hub-external // wait EXTERNAL-IP
 ```
 
-* check self healing (delete pod and check that it is recreated)
+* check self healing feature (delete pod and check that it is recreated)
 ```
 kubectl get pods
 
@@ -491,6 +491,8 @@ open http://<instace_public_ip>:4444/grid/console
 check there are 3 pods with chromes 
 
 kubectl get pods
+
+kubectl scale deployment selenium-node-chrome --replicas=2 // return back
 ```
 
 * run tests from step 1
@@ -502,6 +504,21 @@ npm i
 npm run demoTest
 ```
 
+* open browser and check auto scaling feature (HorizontalPodAutoscaler)
+```
+kubectl autoscale deployment selenium-node-chrome --max 4 --min 1 --cpu-percent 1
+
+run tests
+
+open http://<instace_public_ip>:4444/grid/console
+check that number of pods with chromes automatically increased 
+
+kubectl get pods
+
+kubectl get hpa selenium-node-chrome        // get created pod autoscaling
+kubectl delete hpa selenium-node-chrome     // delete autoscaling 
+```
+
 * delete cluster (in the next step it will be recreated via Terraform)
 ```
 gcloud container clusters delete selenium-grid
@@ -511,6 +528,7 @@ gcloud container clusters delete selenium-grid
 * [Kubernetes engine](https://cloud.google.com/kubernetes-engine/docs/)
 * [Selenium grid K8s example](https://github.com/kubernetes/examples/tree/master/staging/selenium)
 * [Medium Getting Started guide](https://medium.com/@subbarao.pilla/k8s-selenium-grid-selenium-grid-with-docker-on-kubernetes-42af8b9a2cba)
+* [Scaling an application](https://cloud.google.com/kubernetes-engine/docs/how-to/scaling-apps)
 
 **What could be used instead:**
 
