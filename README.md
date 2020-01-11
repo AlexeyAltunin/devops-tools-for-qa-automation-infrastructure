@@ -249,12 +249,12 @@ gcloud auth list                        // get account list
 gcloud config set account `ACCOUNT`     // setup gcloud to use your account
 
 // create instance:
-gcloud compute instances create selenoid-web \
-  --boot-disk-size=50GB \
-  --image-family ubuntu-1604-lts \
-  --image-project=ubuntu-os-cloud \
-  --machine-type=g1-small \
-  --tags selenium \
+gcloud compute instances create selenoid-web \ +
+  --boot-disk-size=50GB \ +
+  --image-family ubuntu-1604-lts \ + 
+  --image-project=ubuntu-os-cloud \ +-
+  --machine-type=g1-small \ +
+  --tags selenium \ +
   --preemptible \
   --restart-on-failure
 ``` 
@@ -543,3 +543,12 @@ The most popular Container Orchestration Tools:
 
  "Moon is a browser automation solution compatible with Selenium Webdriver protocol and using Kubernetes to launch browsers."
  But [it takes money.](https://aerokube.com/moon/latest/#_pricing)
+ 
+ ### 6. IaC
+ 
+ terraform show | grep nat_ip
+ terraform output
+ 
+ You can do it either in the /etc/ansible/ansible.cfg or ~/.ansible.cfg file:
+ [defaults]
+ host_key_checking = False
