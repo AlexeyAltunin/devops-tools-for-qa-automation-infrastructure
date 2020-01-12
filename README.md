@@ -552,3 +552,6 @@ The most popular Container Orchestration Tools:
  You can do it either in the /etc/ansible/ansible.cfg or ~/.ansible.cfg file:
  [defaults]
  host_key_checking = False
+ 
+ terraform apply --auto-approve
+ terraform destroy --auto-approve
