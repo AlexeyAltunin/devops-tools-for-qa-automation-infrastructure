@@ -546,6 +546,9 @@ The most popular Container Orchestration Tools:
  
  ### 6. IaC
  
+ variables update
+ account.example.json
+ 
  terraform show | grep nat_ip
  terraform output
  
