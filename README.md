@@ -414,3 +414,132 @@ automation infrastructure but it is completely up to you to use that provider th
  * [Amazon AWS](https://aws.amazon.com/)
  * [Microsoft Azure](https://azure.microsoft.com/en-us/)
  * [Openstack](https://www.openstack.org)
+ 
+### 5.Orchestration tool (K8s)
+
+The fifth step is to use Google Cloud Platform to run Selenium grid in Kubernetes cluster.
+
+**Preconditions:**
+* Enabled [Kubernetes Engine API](https://console.cloud.google.com/apis/library/)
+* Installed [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+
+**Steps to execute tests:**
+
+* create gcp cluster: 
+ ```
+gcloud container clusters create \
+  --machine-type n1-standard-2 \
+  --num-nodes 2 \
+  --zone europe-west4-a \
+  --cluster-version latest \
+  selenium-grid   
+```
+
+* check kubectl context
+```
+gcloud container clusters get-credentials selenium-grid --zone europe-west4-a --project devops-tools-263410
+kubectl config current-context
+```
+
+* create Selenium grid components
+```   
+cd cloudProviders/gcp/K8s/selenium/
+
+$ kubectl create -f selenium-hub-deployment.yaml
+$ kubectl create -f selenium-hub-svc.yaml
+$ kubectl create -f selenium-node-chrome-deployment.yaml
+```
+
+* expose your hub via the internet
+```
+kubectl expose deployment selenium-hub --name=selenium-hub-external --labels="app=selenium-hub,external=true" --type=LoadBalancer
+kubectl get svc selenium-hub-external // wait EXTERNAL-IP
+```
+
+* check self healing feature (delete pod and check that it is recreated)
+```
+kubectl get pods
+
+output:
+NAME                                    READY   STATUS    RESTARTS   AGE
+selenium-hub-7ff45ff687-f4xr6           1/1     Running   0          43s
+selenium-node-chrome-69fbcd9bf5-bn9nh   1/1     Running   0          37s
+selenium-node-chrome-69fbcd9bf5-ttk4w   1/1     Running   0          37s
+
+kubectl delete pod selenium-node-chrome-69fbcd9bf5-bn9nh
+
+output:
+pod "selenium-node-chrome-69fbcd9bf5-bn9nh" deleted
+
+kubectl get pods
+
+output:
+NAME                                    READY   STATUS    RESTARTS   AGE
+selenium-hub-7ff45ff687-f4xr6           1/1     Running   1          6m3s
+selenium-node-chrome-69fbcd9bf5-qfz5c   1/1     Running   0          4m58s
+selenium-node-chrome-69fbcd9bf5-ttk4w   1/1     Running   0          5m57s
+```
+
+* open browser and check scaling feature
+```
+open http://<instace_public_ip>:4444/grid/console
+check there are 2 pods with chrome
+
+kubectl scale deployment selenium-node-chrome --replicas=3  
+
+open http://<instace_public_ip>:4444/grid/console
+check there are 3 pods with chromes 
+
+kubectl get pods
+
+kubectl scale deployment selenium-node-chrome --replicas=2 // return back
+```
+
+* run tests from step 1
+```
+export REMOTE_HOST=http://<instace_public_ip>:4444/wd/hub
+
+cd uiTestsJS/selenium-web
+npm i
+npm run demoTest
+```
+
+* open browser and check auto scaling feature (HorizontalPodAutoscaler)
+```
+kubectl autoscale deployment selenium-node-chrome --max 4 --min 1 --cpu-percent 1
+
+run tests
+
+open http://<instace_public_ip>:4444/grid/console
+check that number of pods with chromes automatically increased 
+
+kubectl get pods
+
+kubectl get hpa selenium-node-chrome        // get created pod autoscaling
+kubectl delete hpa selenium-node-chrome     // delete autoscaling 
+```
+
+* delete cluster (in the next step it will be recreated via Terraform)
+```
+gcloud container clusters delete selenium-grid
+```
+
+**Links:**
+* [Kubernetes engine](https://cloud.google.com/kubernetes-engine/docs/)
+* [Selenium grid K8s example](https://github.com/kubernetes/examples/tree/master/staging/selenium)
+* [Medium Getting Started guide](https://medium.com/@subbarao.pilla/k8s-selenium-grid-selenium-grid-with-docker-on-kubernetes-42af8b9a2cba)
+* [Scaling an application](https://cloud.google.com/kubernetes-engine/docs/how-to/scaling-apps)
+
+**What could be used instead:**
+
+You can use [any another way](https://kubernetes.io/docs/setup/) to get K8s cluster instead of GCP. 
+
+The most popular Container Orchestration Tools:
+ 
+ * [Docker Swarm](https://www.docker.com/products/docker-swarm)
+ * [Marathon](https://mesosphere.github.io/marathon/)
+ 
+ Instead of Selenium grid in K8s you can use [Moon:](https://aerokube.com/moon/latest/)
+
+ "Moon is a browser automation solution compatible with Selenium Webdriver protocol and using Kubernetes to launch browsers."
+ But [it takes money.](https://aerokube.com/moon/latest/#_pricing)
