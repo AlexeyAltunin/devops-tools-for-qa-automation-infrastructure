@@ -4,3 +4,4 @@
 .DS_Store
 
 ci/gitlab-ci/local-run/
+local-run/

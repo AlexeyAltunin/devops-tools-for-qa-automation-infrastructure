@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "demoTest": "mocha -t 300000 android-create-session.test"
+    "demoTest": "mocha -t 600000 android-create-session.test"
   },
   "dependencies": {
     "wd": "1.11.4",

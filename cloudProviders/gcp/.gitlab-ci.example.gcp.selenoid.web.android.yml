@@ -1,0 +1,27 @@
+stages:
+  - uiTests
+
+runTestViaSelenoidWeb:
+  stage: uiTests
+  script:
+    - cd $WORK_DIRECTORY/uiTestsJS/selenium-web
+    - export REMOTE_HOST=http://<instace_public_ip>:4445/wd/hub
+    - rm -r node_modules/ || true
+    - npm i
+    - npm run demoTest
+  allow_failure: false
+  tags:
+    - local-run
+
+runTestViaSelenoidAndroid:
+  stage: uiTests
+  script:
+    - cd $WORK_DIRECTORY/uiTestsJS/appium-mobile
+    - export USE_SELENOID=true
+    - export APPIUM_HOST=<instace_public_ip>
+    - rm -r node_modules/ || true
+    - npm i
+    - npm run demoTest
+  allow_failure: false
+  tags:
+    - local-run
