@@ -543,3 +543,93 @@ The most popular Container Orchestration Tools:
 
  "Moon is a browser automation solution compatible with Selenium Webdriver protocol and using Kubernetes to launch browsers."
  But [it takes money.](https://aerokube.com/moon/latest/#_pricing)
+ 
+ ### 6. IaC
+ 
+The sixth step is to use Infrastructure as code (IaC) practices and tools to create all that we did in previous 
+steps by typing one magic command. We will use **Terrafrom** to create infrastructure in GCP (VMs, cluster, firewall 
+etc) + 
+Terraform will use **Ansible** as configuration management tool to install all required software. There we will setup, 
+configure and run of Selenium-grid, Selenoid(web/android). 
+To do the same to run Gitlab or any CI system is still your 
+homework :)
+
+**Preconditions:**
+* Installed [Terrafrom](https://learn.hashicorp.com/terraform/getting-started/install.html)
+* Installed [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+* Get [GCP project credential](https://cloud.google.com/community/tutorials/getting-started-on-gcp-with-terraform) 
+(generate file `IaC/terraform/account.json` analogically with `IaC/terraform/account.example.json`)
+ 
+**Steps to execute tests:**
+
+* set correct variables: 
+```
+open IaC/terraform/variables.tf
+set correct public_key_path, private_key_path, project_name, ssh_user
+```
+
+* setup Ansible config to turn off host checking to avoid script is stuck
+```
+open /etc/ansible/ansible.cfg or ~/.ansible.cfg file:
+
+[defaults]
+host_key_checking = False
+```
+ 
+* apply terraform
+```
+cd IaC/terraform/
+terraform init
+terraform apply --auto-approve
+
+output:
+
+ Cluster-Endpoint = 35.198.157.214
+ Selenoid-Android = http://35.234.100.248:8081/#/
+ Selenoid-Android-ssh = ssh alexey@35.204.80.129 -i ~/.ssh/devopsTools
+ Selenoid-Web = http://35.204.80.129:8081/#/
+ Selenoid-Web-ssh = ssh alexey@35.204.80.129 -i ~/.ssh/devopsTools
+```
+
+* apply terraform to setup selenium grid cluster
+```
+cd IaC/terraform/selenium-grid-k8s-resources
+terraform init
+terraform apply --auto-approve
+
+output:
+
+  Selenium-Grid = http://35.198.143.162:4444/grid/console
+```
+
+That's all! It works like a magic, save a lot of time and observable. You can start to run tests. Take your time to 
+investigate *.tf files.
+
+* destroy all resources after work to avoid wasting of money
+```
+cd IaC/terraform/selenium-grid-k8s-resources
+terraform destroy --auto-approve
+
+cd IaC/terraform/
+terraform destroy --auto-approve
+```
+
+**Links:**
+* [Terrafrom](https://www.terraform.io)
+* [Ansible](https://docs.ansible.com)
+* [Ansible and HashiCorp: Better Together](https://www.hashicorp.com/resources/ansible-terraform-better-together)
+* [How to use Ansible with Terraform](https://alex.dzyoba.com/blog/terraform-ansible/)
+* [Ansible Selenoid](https://github.com/SergeyPirogov/selenoid-ansible) instead of docker-compose that is used in this guide
+
+**What could be used instead:**
+
+Whatever you like again. Actually Ansible could be used instead of Terraform in a lot of cases and vice versa. But these
+ tools have their specific destination. You can check comparison [there](https://blog.gruntwork.io/why-we-use-terraform-and-not-chef-puppet-ansible-saltstack-or-cloudformation-7989dad2865c).
+ 
+ The most popular IaC tools:
+ 
+ * [Chef](https://www.chef.io)
+ * [Puppet](https://puppet.com)
+ * [SaltStack](https://saltstack.com)
+ * [CloudFormation](https://aws.amazon.com/cloudformation/)
+ * [Vagrant](https://www.vagrantup.com)
