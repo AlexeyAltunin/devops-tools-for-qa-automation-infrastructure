@@ -17,7 +17,7 @@ be improved starting from running test locally to Infrastructure as Code (IaC) p
 
 6. Infrastructure as a code tools ```Terraform, Ansible```
 
-### 1. Prepare web / mobile demo tests and run it locally
+## 1. Prepare web / mobile demo tests and run it locally
 
 The first step is just to prepare demo tests for web/android and run it locally.
 
@@ -57,7 +57,7 @@ browsers/emulators anymore!
 * Any tests that you like
 * Any test runner 
 
-### 2. Docker based Tools
+## 2. Docker based Tools
 
 The second step is to run tests via popular docker based tools 
 
@@ -131,7 +131,7 @@ Docker is the most popular container runtime environment.
  However in this guide we can use docker as these tools for test running (Selenium grid, Selenoid) are docker based.
 
 
-### 3. CI/CD system
+## 3. CI/CD system
 
 The third step is to run tests via CI system (Gitlab CI) that will be setup 
 locally . There will be 2 jobs to run test via selenium-grid and selenoid-web
@@ -237,7 +237,7 @@ more or used by your company.
  * [Travis](https://travis-ci.com/plans)
  
  
- ### 4. Cloud platforms (GCP)
+ ## 4. Cloud platforms (GCP)
 
 The fourth step is to use Google Cloud Platform to run each docker based tool on separate VM:
 * VM with Selenoid (web)
@@ -441,7 +441,7 @@ automation infrastructure but it is completely up to you to use that provider th
  * [Microsoft Azure](https://azure.microsoft.com/en-us/)
  * [Openstack](https://www.openstack.org)
  
-### 5.Orchestration tool (K8s)
+## 5.Orchestration tool (K8s)
 
 The fifth step is to use Google Cloud Platform to run Selenium grid in Kubernetes cluster.
 
@@ -579,7 +579,7 @@ The most popular Container Orchestration Tools:
  "Moon is a browser automation solution compatible with Selenium Webdriver protocol and using Kubernetes to launch browsers."
  But [it takes money.](https://aerokube.com/moon/latest/#_pricing)
  
- ### 6. IaC
+ ## 6. IaC
  
 The sixth step is to use Infrastructure as code (IaC) practices and tools to create all that we did in previous 
 steps by typing one magic command. We will use **Terrafrom** to create infrastructure in GCP (VMs, cluster, firewall 
