@@ -1,0 +1,36 @@
+stages:
+  - uiTests
+
+runTestViaSeleniumGrid:
+  stage: uiTests
+  script:
+    - cd $WORK_DIRECTORY/dockerBasedTools/selenium-grid
+    - docker-compose up -d
+    - cd $WORK_DIRECTORY/uiTestsJS/selenium-web
+    - export REMOTE_HOST=http://localhost:4444/wd/hub
+    - rm -r node_modules/ || true
+    - npm i
+    - npm run demoTest
+  after_script:
+    - cd $WORK_DIRECTORY/dockerBasedTools/selenium-grid
+    - docker-compose down
+  allow_failure: false
+  tags:
+    - local-run
+
+runTestViaSelenoid:
+  stage: uiTests
+  script:
+    - cd $WORK_DIRECTORY/dockerBasedTools/selenoid-web
+    - docker-compose up -d
+    - cd $WORK_DIRECTORY/uiTestsJS/selenium-web
+    - export REMOTE_HOST=http://localhost:4445/wd/hub
+    - rm -r node_modules/ || true
+    - npm i
+    - npm run demoTest
+  after_script:
+    - cd $WORK_DIRECTORY/dockerBasedTools/selenoid-web
+    - docker-compose down
+  allow_failure: false
+  tags:
+    - local-run

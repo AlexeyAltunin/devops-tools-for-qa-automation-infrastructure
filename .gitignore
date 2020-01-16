@@ -2,3 +2,5 @@
 .idea/
 **/node_modules/
 .DS_Store
+
+ci/gitlab-ci/local-run/
