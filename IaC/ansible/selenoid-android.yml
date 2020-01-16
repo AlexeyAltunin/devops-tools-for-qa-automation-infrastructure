@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+
+  tasks:
+  - name: Ansible copy directory with docker-compose to the remote server
+    copy:
+      src: ../../dockerBasedTools/selenoid-android/
+      dest: /home/
+
+  - name: Pull Android image
+    shell: docker pull selenoid/android:6.0
+
+  - name: Docker compose up
+    shell: cd ../ && docker-compose up -d
