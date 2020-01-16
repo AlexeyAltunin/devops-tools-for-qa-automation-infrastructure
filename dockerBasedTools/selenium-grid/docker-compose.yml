@@ -1,0 +1,36 @@
+version: "3"
+services:
+  selenium-hub:
+    image:  selenium/hub:3.141.59-selenium
+    container_name: selenium-hub
+    ports:
+      - "4444:4444"
+    environment:
+      - GRID_MAX_SESSION=10
+      - GRID_TIMEOUT=7200
+  chrome:
+    image: selenium/node-chrome:3.141.59-selenium
+    volumes:
+      - /dev/shm:/dev/shm
+      - /dev/urandom:/dev/random
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
+      - START_XVFB=true
+      - NODE_MAX_SESSION=5
+      - NODE_MAX_INSTANCES=5
+  firefox:
+    image: selenium/node-firefox:3.141.59-selenium
+    volumes:
+      - /dev/shm:/dev/shm
+      - /dev/urandom:/dev/random
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
+      - START_XVFB=true
+      - NODE_MAX_SESSION=5
+      - NODE_MAX_INSTANCES=5
