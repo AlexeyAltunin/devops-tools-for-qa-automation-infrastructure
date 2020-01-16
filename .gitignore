@@ -5,10 +5,3 @@
 
 ci/gitlab-ci/local-run/
 local-run/
-
-*.tfstate
-*.tfstate.*.backup
-*.tfstate.backup
-*.tfvars
-.terraform/
-**/account.json
