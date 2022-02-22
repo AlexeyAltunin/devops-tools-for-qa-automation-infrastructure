@@ -671,3 +671,4 @@ Whatever you like again. Actually Ansible could be used instead of Terraform in 
  * [SaltStack](https://saltstack.com)
  * [CloudFormation](https://aws.amazon.com/cloudformation/)
  * [Vagrant](https://www.vagrantup.com)
+ * [Spacelift](https://spacelift.io/)
